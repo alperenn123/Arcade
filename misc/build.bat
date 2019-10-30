@@ -10,7 +10,7 @@ REM Asset Cooker Build
 REM cl -nologo -O2 -Zi -FC -WX -Wall %warnings_to_ignore% ..\code\cooker.c /link user32.lib gdi32.lib -incremental:no -opt:ref
 
 REM Game Build
-cl -nologo -O2 -FC -WX -Wall -Zi -DDEVELOPMENT=0 -DPROFILER=0 %warnings_to_ignore% ..\code\win32_platform.cpp /link user32.lib gdi32.lib winmm.lib -incremental:no -opt:ref
+cl -nologo -O2 -FC -WX -Wall -Zi -DDEVELOPMENT=0 -DPROFILER=0 %warnings_to_ignore% ..\code\win32_platform.c /link user32.lib gdi32.lib winmm.lib -incremental:no -opt:ref
 
 
 del lock.tmp
