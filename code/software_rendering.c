@@ -35,3 +35,13 @@ static void draw_rectangle_in_pixels(int x0,int y0,int x1,int y1,u32 color)
         pixel = row;
     }
 }
+
+static void draw_rect(v2 p,v2 half_size,u32 color)
+{
+    int x0 = (int)(p.x - half_size.x);
+    int y0 = (int)(p.y - half_size.y);
+    int x1 = (int)(p.x + half_size.x);
+    int y1 = (int)(p.y + half_size.y);
+    
+    draw_rectangle_in_pixels(x0,y0,x1,y1,color);
+}

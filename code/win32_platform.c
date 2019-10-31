@@ -1,6 +1,14 @@
 #include <windows.h>
 #include "utils.c"
 #include "math.c"
+
+#define process_button(vk,b)\
+if (vk_code == vk)\
+{\
+    input.buttons[b].is_changed = is_down != input.buttons[BUTTON_LEFT].is_down;\
+    input.buttons[b].is_down = is_down;\
+}
+
 static u8 running = TRUE;
 
 typedef struct {
@@ -11,6 +19,8 @@ typedef struct {
 
 Render_Buffer render_buffer = {0};
 #include "software_rendering.c"
+#include "platform_common.c"
+#include "game.c"
 LRESULT CALLBACK WindowCallback(HWND window, UINT message, WPARAM w_param, LPARAM l_param)
 {
     LRESULT result = 0;
@@ -75,8 +85,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         );
     HDC hdc = GetDC(win32_window);
     b32 character = FALSE;
+    Input input = {0};
     while(running)
     {
+        for(int i = 0;i < BUTTON_COUNT;i++)
+        {
+            input.buttons[i].is_changed = FALSE;
+        }
         MSG local_message = {0};
         while (PeekMessageA(&local_message,win32_window,0,0,PM_REMOVE))
         {
@@ -92,10 +107,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     b32 was_down = ((local_message.lParam & (1 << 30)) != 0);
                     b32 is_down = ((local_message.lParam & (1 << 31)) == 0);
                     
-                    if (vk_code == VK_LEFT)
-                    {
-                        character = TRUE;
-                    }
+                    process_button(VK_LEFT,BUTTON_LEFT);
+                    process_button(VK_RIGHT,BUTTON_RIGHT);
+                    process_button(VK_UP,BUTTON_UP);
+                    process_button(VK_DOWN,BUTTON_DOWN);
+                    
                 }break;
                 default:
                 {
@@ -105,11 +121,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             }
         }
         
-        clear_screen(0xffffff00);
-        if(character)
-        {
-            draw_rectangle_in_pixels(20,20,50,50,0xffff4400);
-        }
+        simulate_game(&input);
         //render
         StretchDIBits(hdc, 0, 0, render_buffer.width, render_buffer.height, 0, 0, render_buffer.width, render_buffer.height, render_buffer.pixels, &render_buffer.win32_bitmap_info, DIB_RGB_COLORS, SRCCOPY);
     }
